@@ -21,10 +21,14 @@ namespace MasterlistOfBusiness.Controllers
 
         // GET: Inwentarz
         public async Task<IActionResult> Index()
-        {
-              return _context.Inwentarz != null ? 
-                          View(await _context.Inwentarz.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Inwentarz'  is null.");
+        {     
+            var inw = _context.Inwentarz
+                .Include(i => i.Konto)
+                .Include(i => i.Produkt)
+                .Include(i => i.Transakcje)
+                .AsNoTracking();
+            
+              return View(await inw.ToListAsync());
         }
 
         // GET: Inwentarz/Details/5
