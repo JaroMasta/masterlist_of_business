@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.haslo)
+                @Html.DisplayNameFor(model => model.HasloHash)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.typ)
@@ -24,9 +24,7 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.haslo)
-            </td>
+
             <td>
                 @Html.DisplayFor(modelItem => item.typ)
             </td>

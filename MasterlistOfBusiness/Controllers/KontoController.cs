@@ -36,7 +36,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var konto = await _context.Konto
+            var konto = await _context.Konto.Include(k=> k.Inwentarze)
                 .FirstOrDefaultAsync(m => m.id_konta == id);
             if (konto == null)
             {
