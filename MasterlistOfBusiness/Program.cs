@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using MasterlistOfBusiness.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<MOBContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("MOBContext") ?? throw new InvalidOperationException("Connection string 'MOBContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

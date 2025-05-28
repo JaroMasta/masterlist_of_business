@@ -1,0 +1,42 @@
+@model MasterlistOfBusiness.Models.Konto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Konto</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.id_sprzedawcy)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.id_sprzedawcy)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.link)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.link)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NazwaUzytkownika)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NazwaUzytkownika)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Platforma)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Platforma)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id_konta">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,53 @@
+@model IEnumerable<MasterlistOfBusiness.Models.Konto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id_sprzedawcy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.link)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NazwaUzytkownika)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Platforma)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id_sprzedawcy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.link)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NazwaUzytkownika)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Platforma)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id_konta">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id_konta">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.id_konta">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

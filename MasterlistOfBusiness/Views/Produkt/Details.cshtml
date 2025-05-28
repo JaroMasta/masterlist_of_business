@@ -1,0 +1,30 @@
+@model MasterlistOfBusiness.Models.Produkt
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Produkt</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.typ)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.typ)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.opis)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.opis)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id_produktu">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
