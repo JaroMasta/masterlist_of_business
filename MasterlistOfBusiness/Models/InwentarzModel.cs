@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MasterlistOfBusiness.Models
 {
 public class Inwentarz
-    {
+    {   
         [Key]
         public int id_inwentarza { get; set; }
         public int id_konta { get; set; }

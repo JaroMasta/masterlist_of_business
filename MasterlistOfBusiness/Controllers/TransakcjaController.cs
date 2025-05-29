@@ -22,9 +22,10 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja
         public async Task<IActionResult> Index()
         {
-              return _context.Transakcja != null ? 
-                          View(await _context.Transakcja.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Transakcja'  is null.");
+            var tr = _context.Transakcja.Include(t => t.Inwentarz).AsNoTracking();
+              return _context.Transakcja != null ?
+                        View(await tr.ToListAsync()) :
+                        Problem("Entity set 'MOBContext.Transakcja'  is null.");
         }
 
         // GET: Transakcja/Details/5
@@ -35,7 +36,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var transakcja = await _context.Transakcja
+            var transakcja = await _context.Transakcja.Include(t => t.Inwentarz)
                 .FirstOrDefaultAsync(m => m.id_transakcji == id);
             if (transakcja == null)
             {
@@ -43,6 +44,15 @@ namespace MasterlistOfBusiness.Controllers
             }
 
             return View(transakcja);
+        }
+
+        private void PopulateInwentarzDropDownList(object selectedInwentarz = null)
+        {
+            var Inwentarz = from e in _context.Inwentarz
+                                orderby e.ilosc
+                                select e;
+            var res = Inwentarz.AsNoTracking();
+            ViewBag.InwentarzID = new SelectList(res, "Id", "Nazwa", selectedInwentarz);
         }
 
         // GET: Transakcja/Create
@@ -56,10 +66,19 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja)
+        public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja, IFormCollection form)
         {
+            string inwentarzValue = form["Inwentarz"].ToString();
             if (ModelState.IsValid)
             {
+                Inwentarz inwentarz = null;
+                if (inwentarzValue != "-1")
+                {
+                    var k = _context.Inwentarz.Where(k => k.id_inwentarza == int.Parse(inwentarzValue));
+                    if (k.Count() > 0)
+                        inwentarz = k.First();
+                }
+
                 _context.Add(transakcja);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

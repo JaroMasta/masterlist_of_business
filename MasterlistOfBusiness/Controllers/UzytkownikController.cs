@@ -23,7 +23,7 @@ namespace MasterlistOfBusiness.Controllers
         public async Task<IActionResult> Index()
         {
               return _context.Uzytkownik != null ? 
-                          View(await _context.Uzytkownik.ToListAsync()) :
+                          View(await _context.Uzytkownik.Include(u => u.Sprzedawca).AsNoTracking().ToListAsync()) :
                           Problem("Entity set 'MOBContext.Uzytkownik'  is null.");
         }
 
@@ -35,7 +35,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var uzytkownik = await _context.Uzytkownik
+            var uzytkownik = await _context.Uzytkownik.Include(u => u.Sprzedawca)
                 .FirstOrDefaultAsync(m => m.login == id);
             if (uzytkownik == null)
             {
@@ -43,6 +43,15 @@ namespace MasterlistOfBusiness.Controllers
             }
 
             return View(uzytkownik);
+        }
+
+        private void PopulateSprzedawcaDropDownList(object selectedSprzedawca = null)
+        {
+            var Sprzedawca = from e in _context.Sprzedawca
+                                orderby e.login
+                                select e;
+            var res = Sprzedawca.AsNoTracking();
+            ViewBag.SprzedawcaID = new SelectList(res, "Id", "Nazwa", selectedSprzedawca);
         }
 
         // GET: Uzytkownik/Create
@@ -56,10 +65,18 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("login,haslo,typ")] Uzytkownik uzytkownik)
+        public async Task<IActionResult> Create([Bind("login,haslo,typ")] Uzytkownik uzytkownik, IFormCollection form)
         {
+            string sprzedawcaValue = form["Sprzedawca"].ToString();
             if (ModelState.IsValid)
             {
+                Sprzedawca sprzedawca = null;
+                if (sprzedawcaValue != "-1")
+                {
+                    var k = _context.Sprzedawca.Where(k => k.id_sprzedawcy == int.Parse(sprzedawcaValue));
+                    if (k.Count() > 0)
+                        sprzedawca = k.First();
+                }
                 _context.Add(uzytkownik);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
