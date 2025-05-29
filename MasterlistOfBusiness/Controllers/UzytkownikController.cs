@@ -204,7 +204,14 @@ namespace MasterlistOfBusiness.Controllers
 
                 await HttpContext.SignInAsync("MyCookieAuth", principal);
                 Console.WriteLine($"Zalogowano użytkownika: {user.login} ({user.typ})");
-                return RedirectToAction("Index", "Home");
+                if (user.typ == "Admin")
+                {
+                    return RedirectToAction("Index", "Uzytkownik"); // Redirect to Uzytkownik index for Admins
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home"); // Redirect to Home index for regular users
+                }    return RedirectToAction("Index", "Home");
             }
             if (user == null)
             {
