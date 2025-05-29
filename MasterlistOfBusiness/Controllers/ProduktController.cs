@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class ProduktController : Controller
     {
         private readonly MOBContext _context;
@@ -152,14 +154,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Produkt.Remove(produkt);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProduktExists(int id)
         {
-          return (_context.Produkt?.Any(e => e.id_produktu == id)).GetValueOrDefault();
+            return (_context.Produkt?.Any(e => e.id_produktu == id)).GetValueOrDefault();
         }
     }
 }

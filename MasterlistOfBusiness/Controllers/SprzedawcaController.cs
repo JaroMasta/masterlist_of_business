@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class SprzedawcaController : Controller
     {
         private readonly MOBContext _context;
@@ -22,9 +24,9 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Sprzedawca
         public async Task<IActionResult> Index()
         {
-              return _context.Sprzedawca != null ? 
-                          View(await _context.Sprzedawca.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Sprzedawca'  is null.");
+            return _context.Sprzedawca != null ?
+                        View(await _context.Sprzedawca.ToListAsync()) :
+                        Problem("Entity set 'MOBContext.Sprzedawca'  is null.");
         }
 
         // GET: Sprzedawca/Details/5
@@ -150,14 +152,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Sprzedawca.Remove(sprzedawca);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool SprzedawcaExists(int id)
         {
-          return (_context.Sprzedawca?.Any(e => e.id_sprzedawcy == id)).GetValueOrDefault();
+            return (_context.Sprzedawca?.Any(e => e.id_sprzedawcy == id)).GetValueOrDefault();
         }
     }
 }

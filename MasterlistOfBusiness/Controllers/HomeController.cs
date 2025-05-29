@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MasterlistOfBusiness.Models;
-
+using Microsoft.AspNetCore.Authorization;
 namespace MasterlistOfBusiness.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
+
     private readonly ILogger<HomeController> _logger;
 
     public HomeController(ILogger<HomeController> logger)

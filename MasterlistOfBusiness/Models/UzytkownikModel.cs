@@ -8,14 +8,17 @@ namespace MasterlistOfBusiness.Models
         [Display(Name = "Login")]
         public string login { get; set; }
 
-        [Required]
-        [Display(Name = "Hash hasła")]
-        public string HasloHash { get; set; }
+        public string? HasloHash { get; set; }
 
         [Display(Name = "Typ konta")]
         //TODO: Zamienić na enum
         public string? typ { get; set; }
 
+
+        [Required]
+        [NotMapped]
+        [Display(Name = "Hasło")]
+        public string Haslo { get; set; }
         // Nawigacja do encji Sprzedawca
         public virtual ICollection<Sprzedawca>? Sprzedawca { get; set; } = new List<Sprzedawca>();
     }

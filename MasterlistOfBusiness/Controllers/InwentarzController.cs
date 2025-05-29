@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class InwentarzController : Controller
     {
         private readonly MOBContext _context;
@@ -21,14 +23,14 @@ namespace MasterlistOfBusiness.Controllers
 
         // GET: Inwentarz
         public async Task<IActionResult> Index()
-        {     
+        {
             var inw = _context.Inwentarz
                 .Include(i => i.Konto)
                 .Include(i => i.Produkt)
                 .Include(i => i.Transakcje)
                 .AsNoTracking();
-            
-              return View(await inw.ToListAsync());
+
+            return View(await inw.ToListAsync());
         }
 
         // GET: Inwentarz/Details/5
@@ -154,14 +156,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Inwentarz.Remove(inwentarz);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool InwentarzExists(int id)
         {
-          return (_context.Inwentarz?.Any(e => e.id_inwentarza == id)).GetValueOrDefault();
+            return (_context.Inwentarz?.Any(e => e.id_inwentarza == id)).GetValueOrDefault();
         }
     }
 }

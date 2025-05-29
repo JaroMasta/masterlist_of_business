@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class TransakcjaController : Controller
     {
         private readonly MOBContext _context;
@@ -22,9 +24,9 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja
         public async Task<IActionResult> Index()
         {
-              return _context.Transakcja != null ? 
-                          View(await _context.Transakcja.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Transakcja'  is null.");
+            return _context.Transakcja != null ?
+                        View(await _context.Transakcja.ToListAsync()) :
+                        Problem("Entity set 'MOBContext.Transakcja'  is null.");
         }
 
         // GET: Transakcja/Details/5
@@ -150,14 +152,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Transakcja.Remove(transakcja);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TransakcjaExists(int id)
         {
-          return (_context.Transakcja?.Any(e => e.id_transakcji == id)).GetValueOrDefault();
+            return (_context.Transakcja?.Any(e => e.id_transakcji == id)).GetValueOrDefault();
         }
     }
 }

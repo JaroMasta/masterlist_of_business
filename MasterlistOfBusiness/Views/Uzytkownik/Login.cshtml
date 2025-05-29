@@ -4,6 +4,7 @@
 
 <h2>Login</h2>
 <form asp-action="Login" method="post">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     <div class="form-group">
         <label for="login">Login</label>
         <input name="login" class="form-control" required />
