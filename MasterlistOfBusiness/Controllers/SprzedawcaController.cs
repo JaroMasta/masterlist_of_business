@@ -101,16 +101,7 @@ namespace MasterlistOfBusiness.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (!ModelState.IsValid)
-            {
-                foreach (var modelState in ModelState)
-                {
-                    foreach (var error in modelState.Value.Errors)
-                    {
-                        Console.WriteLine($"Error in {modelState.Key}: {error.ErrorMessage}");
-                    }
-                }
-            }
+
             return View(sprzedawca);
         }
 

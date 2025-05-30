@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing.Printing;
 
 namespace MasterlistOfBusiness.Controllers
 {
@@ -24,8 +25,12 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Konto
         public async Task<IActionResult> Index()
         {
+            var userLogin = User.Identity?.Name;
 
-            var prac = _context.Konto.Include(p => p.Sprzedawca).Include(p => p.Inwentarze).AsNoTracking();
+             if (string.IsNullOrEmpty(userLogin))
+                return RedirectToAction("Login", "Account");
+
+            var prac = _context.Konto.Include(p => p.Sprzedawca).Where(p => p.Sprzedawca.UzytkownikLogin == userLogin).AsNoTracking();
             // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
             return View(await prac.ToListAsync());
         }
@@ -51,6 +56,9 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Konto/Create
         public IActionResult Create()
         {
+            var userLogin = User.Identity.Name;
+            var sprzed = _context.Sprzedawca.Where(s => s.UzytkownikLogin == userLogin).ToList();
+            ViewData["Sprzedawca"] = new SelectList(sprzed, "id_sprzedawcy", "login");
             return View();
         }
 
@@ -61,18 +69,45 @@ namespace MasterlistOfBusiness.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("id_konta,id_sprzedawcy,link,NazwaUzytkownika,Platforma")] Konto konto)
         {
+
+            var selectedVendor = _context.Sprzedawca.Find(konto.id_sprzedawcy);
+
+            if (selectedVendor == null)
+            {
+                ModelState.AddModelError("", "Nie wybrano sprzedawcy");
+            }
+
+            konto.Sprzedawca = selectedVendor;
+            ModelState.Remove("Sprzedawca");
+
             if (ModelState.IsValid)
             {
+
                 _context.Add(konto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            if (!ModelState.IsValid)
+            {
+                foreach (var modelState in ModelState)
+                {
+                    foreach (var error in modelState.Value.Errors)
+                    {
+                        Console.WriteLine($"Error in {modelState.Key}: {error.ErrorMessage}");
+                    }
+                }
+            }
+
             return View(konto);
         }
 
         // GET: Konto/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var userLogin = User.Identity.Name;
+            var sprzed = _context.Sprzedawca.Where(s => s.UzytkownikLogin == userLogin).ToList();
+            ViewData["Sprzedawca"] = new SelectList(sprzed, "id_sprzedawcy", "login");
+
             if (id == null || _context.Konto == null)
             {
                 return NotFound();
