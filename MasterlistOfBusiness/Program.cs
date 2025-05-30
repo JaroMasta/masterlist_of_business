@@ -31,10 +31,16 @@ using (var scope = app.Services.CreateScope())
         {
             login = "admin",
             HasloHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+            Haslo = "", // To jest tylko do weryfikacji, nie powinno być przechowywane w bazie
             typ = "Admin"
         };
         context.Uzytkownik.Add(admin);
         context.SaveChanges();
+        Console.WriteLine("Admin user created.");
+    }
+    else
+    {
+        Console.WriteLine("Admin user already exists.");
     }
 }
 

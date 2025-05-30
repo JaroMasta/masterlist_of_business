@@ -10,9 +10,12 @@ using MasterlistOfBusiness.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize (Roles = "Admin")] // Ensure only Admins can access this controller, but login and logout is allowed for all users
     public class UzytkownikController : Controller
     {
         private readonly MOBContext _context;
@@ -84,6 +87,15 @@ namespace MasterlistOfBusiness.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            else
+            { 
+                Console.WriteLine("ModelState is invalid. Errors:");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"- {error.ErrorMessage}");
+                }
+            }
+
             return View(uzytkownik);
         }
 
@@ -108,7 +120,7 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("login,haslo,typ")] Uzytkownik uzytkownik)
+        public async Task<IActionResult> Edit(string id, [Bind("login,HasloHash,typ")] Uzytkownik uzytkownik)
         {
             if (id != uzytkownik.login)
             {
@@ -182,11 +194,14 @@ namespace MasterlistOfBusiness.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login() => View();
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string login, string haslo)
         {
+            Console.WriteLine($"Login POST called with login={login}");
             var user = await _context.Uzytkownik.FirstOrDefaultAsync(u => u.login == login);
             if (user != null && BCrypt.Net.BCrypt.Verify(haslo, user.HasloHash))
             {
@@ -200,14 +215,34 @@ namespace MasterlistOfBusiness.Controllers
                 var principal = new ClaimsPrincipal(identity);
 
                 await HttpContext.SignInAsync("MyCookieAuth", principal);
-
-                return RedirectToAction("Index", "Home");
+                
+                Console.WriteLine($"Zalogowano użytkownika: {user.login} ({user.typ})");
+                if (user.typ == "Admin")
+                {
+                    return RedirectToAction("Index", "Uzytkownik"); // Redirect to Uzytkownik index for Admins
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home"); // Redirect to Home index for regular users
+                }    return RedirectToAction("Index", "Home");
+            }
+            if (user == null)
+            {
+                Console.WriteLine("Nie znaleziono użytkownika.");
+            }
+            else if (!BCrypt.Net.BCrypt.Verify(haslo, user.HasloHash))
+            {
+                Console.WriteLine("Hasło nieprawidłowe.");
+            }
+            else
+            {
+                Console.WriteLine("Wystąpił nieoczekiwany błąd.");
             }
 
             ModelState.AddModelError("", "Nieprawidłowy login lub hasło");
             return View();
         }
-
+    
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("MyCookieAuth");

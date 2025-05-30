@@ -9,12 +9,17 @@ namespace MasterlistOfBusiness.Models
         public int id_sprzedawcy { get; set; }
 
         [Required]
-        [Display(Name = "Login sprzedawcy")]
+        [Display(Name = "Nazwa sprzedawcy")]
         public string login { get; set; }
 
         // Nawigacja do encji Konto i Uzytkownik, virtual dla lazy loading (chcemy lazy loading?)
         [Display(Name = "Konto sprzedawcy")]
         public virtual ICollection<Konto>? Konta { get; set; } = new List<Konto>();
+
+        [Required]
+        [Display(Name = "Login użytkownika")]
+        public string UzytkownikLogin { get; set; }
+
         [Display(Name = "Użytkownik sprzedawcy aka osoba ktora ma tego sprzedawce (zazwyczaj ma tylko jednego)")]
         public virtual Uzytkownik? Uzytkownik { get; set; }
     }

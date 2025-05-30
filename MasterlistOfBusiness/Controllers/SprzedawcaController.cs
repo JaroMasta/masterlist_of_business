@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class SprzedawcaController : Controller
     {
         private readonly MOBContext _context;
@@ -22,7 +24,13 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Sprzedawca
         public async Task<IActionResult> Index()
         {
-            var sprzed = _context.Sprzedawca.Include(p => p.Konta).Include(p => p.Uzytkownik).AsNoTracking();
+            var userLogin = User.Identity.Name;
+
+            if (string.IsNullOrEmpty(userLogin))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var sprzed = _context.Sprzedawca.Include(p => p.Konta).Include(p => p.Uzytkownik).Where(s => s.UzytkownikLogin == userLogin).AsNoTracking();
               return _context.Sprzedawca != null ?
                         View(await sprzed.ToListAsync()) :
                         Problem("Entity set 'MOBContext.Sprzedawca'  is null.");
@@ -75,31 +83,33 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id_sprzedawcy,login")] Sprzedawca sprzedawca, IFormCollection form)
+        public async Task<IActionResult> Create(Sprzedawca sprzedawca, IFormCollection form)
         {
-            string kontoValue = form["Konto"].ToString();
-            string uzytkownikValue = form["Uzytkownik"].ToString();
+            var userLogin = User.Identity.Name;
+            sprzedawca.UzytkownikLogin = userLogin;
+            ModelState.Remove("UzytkownikLogin");
+
+            if (string.IsNullOrEmpty(userLogin))
+                return RedirectToAction("Login", "Account");
+
+            
             if (ModelState.IsValid)
             {
-                Konto konto = null;
-                if (kontoValue != "-1")
-                {
-                    var k = _context.Konto.Where(k => k.id_konta == int.Parse(kontoValue));
-                    if (k.Count() > 0)
-                        konto = k.First();
-                }
-
-                Uzytkownik uzytkownik = null;
-                if (uzytkownikValue != "-1")
-                {
-                    var k = _context.Uzytkownik.Where(k => k.login == uzytkownikValue);
-                    if (k.Count() > 0)
-                        uzytkownik = k.First();
-                }
-
+                Console.WriteLine("Dziala");
                 _context.Add(sprzedawca);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                foreach (var modelState in ModelState)
+                {
+                    foreach (var error in modelState.Value.Errors)
+                    {
+                        Console.WriteLine($"Error in {modelState.Key}: {error.ErrorMessage}");
+                    }
+                }
             }
             return View(sprzedawca);
         }
@@ -187,14 +197,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Sprzedawca.Remove(sprzedawca);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool SprzedawcaExists(int id)
         {
-          return (_context.Sprzedawca?.Any(e => e.id_sprzedawcy == id)).GetValueOrDefault();
+            return (_context.Sprzedawca?.Any(e => e.id_sprzedawcy == id)).GetValueOrDefault();
         }
     }
 }

@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasterlistOfBusiness.Controllers
 {
+    [Authorize]
     public class KontoController : Controller
     {
         private readonly MOBContext _context;
@@ -22,7 +24,7 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Konto
         public async Task<IActionResult> Index()
         {
-            
+
             var prac = _context.Konto.Include(p => p.Sprzedawca).Include(p => p.Inwentarze).AsNoTracking();
             // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
             return View(await prac.ToListAsync());
@@ -36,7 +38,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var konto = await _context.Konto.Include(k=> k.Inwentarze)
+            var konto = await _context.Konto.Include(k => k.Inwentarze)
                 .FirstOrDefaultAsync(m => m.id_konta == id);
             if (konto == null)
             {
@@ -151,14 +153,14 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Konto.Remove(konto);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool KontoExists(int id)
         {
-          return (_context.Konto?.Any(e => e.id_konta == id)).GetValueOrDefault();
+            return (_context.Konto?.Any(e => e.id_konta == id)).GetValueOrDefault();
         }
     }
 }
