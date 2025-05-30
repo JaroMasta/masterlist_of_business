@@ -9,8 +9,8 @@ namespace MasterlistOfBusiness.Models
         public string login { get; set; }
 
         [Required]
-        [Display(Name = "Haslo")]
-        public string haslo { get; set; }
+        [Display(Name = "Hash hasła")]
+        public string HasloHash { get; set; }
 
         [Display(Name = "Typ konta")]
         //TODO: Zamienić na enum

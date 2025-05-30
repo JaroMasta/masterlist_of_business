@@ -22,9 +22,10 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Konto
         public async Task<IActionResult> Index()
         {
-              return _context.Konto != null ? 
-                          View(await _context.Konto.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Konto'  is null.");
+            
+            var prac = _context.Konto.Include(p => p.Sprzedawca).Include(p => p.Inwentarze).AsNoTracking();
+            // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
+            return View(await prac.ToListAsync());
         }
 
         // GET: Konto/Details/5
@@ -35,7 +36,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var konto = await _context.Konto
+            var konto = await _context.Konto.Include(k=> k.Inwentarze)
                 .FirstOrDefaultAsync(m => m.id_konta == id);
             if (konto == null)
             {

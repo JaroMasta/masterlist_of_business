@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MasterlistOfBusiness.Data;
 using MasterlistOfBusiness.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MasterlistOfBusiness.Controllers
 {
@@ -167,14 +170,48 @@ namespace MasterlistOfBusiness.Controllers
             {
                 _context.Uzytkownik.Remove(uzytkownik);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UzytkownikExists(string id)
         {
-          return (_context.Uzytkownik?.Any(e => e.login == id)).GetValueOrDefault();
+            return (_context.Uzytkownik?.Any(e => e.login == id)).GetValueOrDefault();
+        }
+
+
+        [HttpGet]
+        public IActionResult Login() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> Login(string login, string haslo)
+        {
+            var user = await _context.Uzytkownik.FirstOrDefaultAsync(u => u.login == login);
+            if (user != null && BCrypt.Net.BCrypt.Verify(haslo, user.HasloHash))
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.login),
+                    new Claim(ClaimTypes.Role, user.typ ?? "User")
+                };
+
+                var identity = new ClaimsIdentity(claims, "MyCookieAuth");
+                var principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync("MyCookieAuth", principal);
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError("", "Nieprawidłowy login lub hasło");
+            return View();
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("MyCookieAuth");
+            return RedirectToAction("Login");
         }
     }
 }

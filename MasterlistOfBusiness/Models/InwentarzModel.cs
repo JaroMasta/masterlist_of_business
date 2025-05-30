@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace MasterlistOfBusiness.Models
 {
-public class Inwentarz
-    {   
+    public class Inwentarz
+    {
         [Key]
         public int id_inwentarza { get; set; }
         public int id_konta { get; set; }
@@ -24,6 +24,10 @@ public class Inwentarz
 
         [Display(Name = "Produkt")]
         public virtual Produkt Produkt { get; set; }
+        
+        [Display(Name = "Transakcje")]
+        public virtual ICollection<Transakcja>? Transakcje { get; set; } = new List<Transakcja>();
+
     }
 
 }

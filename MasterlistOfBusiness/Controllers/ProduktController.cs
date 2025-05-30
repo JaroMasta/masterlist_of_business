@@ -19,12 +19,14 @@ namespace MasterlistOfBusiness.Controllers
             _context = context;
         }
 
-        // GET: Produkt
+        // GET: Produkt 
         public async Task<IActionResult> Index()
         {
-              return _context.Produkt != null ? 
-                          View(await _context.Produkt.ToListAsync()) :
-                          Problem("Entity set 'MOBContext.Produkt'  is null.");
+            var produkty = _context.Produkt
+                .Include(p => p.Inwentarze)
+                .AsNoTracking();
+            // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
+            return View(await produkty.ToListAsync());
         }
 
         // GET: Produkt/Details/5
