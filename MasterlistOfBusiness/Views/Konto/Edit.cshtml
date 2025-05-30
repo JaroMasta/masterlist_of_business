@@ -18,7 +18,7 @@
                 <select asp-for="id_sprzedawcy" class="form-control" asp-items="@(ViewData["Sprzedawca"] as SelectList)">
                     <option value="">Wybierz sprzedawcę</option>
                 </select>
-            <span asp-validation-for="id_sprzedawcy" class="text-danger"></span>
+            <span asp-validation-for="Sprzedawca" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="link" class="control-label"></label>

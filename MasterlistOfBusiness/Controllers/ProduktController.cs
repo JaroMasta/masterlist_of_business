@@ -24,8 +24,13 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Produkt 
         public async Task<IActionResult> Index()
         {
-            var produkty = _context.Produkt
-                .Include(p => p.Inwentarze)
+            var userLogin = User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userLogin))
+                return RedirectToAction("Login", "Account");
+
+            var produkty = _context.Produkt.Where(p => p.Inwentarze.Any(i =>
+                i.Konto.Sprzedawca.UzytkownikLogin == userLogin))
                 .AsNoTracking();
             // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
             return View(await produkty.ToListAsync());

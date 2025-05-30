@@ -31,7 +31,7 @@ namespace MasterlistOfBusiness.Controllers
                 return RedirectToAction("Login", "Account");
 
             var prac = _context.Konto.Include(p => p.Sprzedawca).Where(p => p.Sprzedawca.UzytkownikLogin == userLogin).AsNoTracking();
-            // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
+
             return View(await prac.ToListAsync());
         }
 
@@ -82,7 +82,6 @@ namespace MasterlistOfBusiness.Controllers
 
             if (ModelState.IsValid)
             {
-
                 _context.Add(konto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -93,7 +92,7 @@ namespace MasterlistOfBusiness.Controllers
                 {
                     foreach (var error in modelState.Value.Errors)
                     {
-                        Console.WriteLine($"Error in {modelState.Key}: {error.ErrorMessage}");
+                        ModelState.AddModelError("", error.ErrorMessage);
                     }
                 }
             }
@@ -128,6 +127,16 @@ namespace MasterlistOfBusiness.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("id_konta,id_sprzedawcy,link,NazwaUzytkownika,Platforma")] Konto konto)
         {
+            var selectedVendor = _context.Sprzedawca.Find(konto.id_sprzedawcy);
+
+            if (selectedVendor == null)
+            {
+                ModelState.AddModelError("", "Nie wybrano sprzedawcy");
+            }
+
+            konto.Sprzedawca = selectedVendor;
+            ModelState.Remove("Sprzedawca");
+
             if (id != konto.id_konta)
             {
                 return NotFound();

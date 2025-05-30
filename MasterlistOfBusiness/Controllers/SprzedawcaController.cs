@@ -30,10 +30,13 @@ namespace MasterlistOfBusiness.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var sprzed = _context.Sprzedawca.Include(p => p.Konta).Include(p => p.Uzytkownik).Where(s => s.UzytkownikLogin == userLogin).AsNoTracking();
+
+            var sprzed = _context.Sprzedawca.Include(s => s.Uzytkownik).Include(s => s.Konta).
+                            Where(s => s.UzytkownikLogin == userLogin).AsNoTracking();
+            
               return _context.Sprzedawca != null ?
-                        View(await sprzed.ToListAsync()) :
-                        Problem("Entity set 'MOBContext.Sprzedawca'  is null.");
+                      View(await sprzed.ToListAsync()) :
+                      Problem("Entity set 'MOBContext.Sprzedawca'  is null.");
         }
 
         // GET: Sprzedawca/Details/5
@@ -54,23 +57,6 @@ namespace MasterlistOfBusiness.Controllers
             return View(sprzedawca);
         }
 
-        private void PopulateKontaDropDownList(object selectedKonto = null)
-        {
-            var Konta = from e in _context.Konto
-                                orderby e.NazwaUzytkownika
-                                select e;
-            var res = Konta.AsNoTracking();
-            ViewBag.KontaID = new SelectList(res, "Id", "Nazwa", selectedKonto);
-        }
-
-        private void PopulateUzytkownikDropDownList(object selectedUzytkownik = null)
-        {
-            var Uzytkownik = from e in _context.Uzytkownik
-                                orderby e.login
-                                select e;
-            var res = Uzytkownik.AsNoTracking();
-            ViewBag.UzytkownikID = new SelectList(res, "Id", "Nazwa", selectedUzytkownik);
-        }
 
         // GET: Sprzedawca/Create
         public IActionResult Create()
@@ -92,10 +78,10 @@ namespace MasterlistOfBusiness.Controllers
             if (string.IsNullOrEmpty(userLogin))
                 return RedirectToAction("Login", "Account");
 
+            sprzedawca.Uzytkownik = _context.Uzytkownik.FirstOrDefault(u => u.login == userLogin);
             
             if (ModelState.IsValid)
             {
-                Console.WriteLine("Dziala");
                 _context.Add(sprzedawca);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
