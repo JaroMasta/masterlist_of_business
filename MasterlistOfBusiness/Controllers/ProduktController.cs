@@ -58,8 +58,8 @@ namespace MasterlistOfBusiness.Controllers
         public IActionResult Create()
         {
             var userLogin = User.Identity?.Name;
-            var sprzed = _context.Sprzedawca.Where(s => s.UzytkownikLogin == userLogin).ToList();
-            ViewData["Sprzedawca"] = new SelectList(sprzed, "id_sprzedawcy", "login");
+            var konto = _context.Konto.Where(s => s.Sprzedawca.UzytkownikLogin == userLogin).ToList();
+            ViewData["Konto"] = new SelectList(konto, "id_konta", "NazwaUzytkownika");
             return View();
         }
 
@@ -68,13 +68,32 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id_produktu,typ,opis")] Produkt produkt)
+        public async Task<IActionResult> Create([Bind("id_produktu,typ,opis,cena,ilosc,id_konta")] Produkt produkt)
         {
+            var selectedAccount = _context.Konto.Find(produkt.id_konta);
+            if (selectedAccount == null)
+            {
+                ModelState.AddModelError("", "Nie wybrano konta");
+            }
+
+            produkt.Konto = selectedAccount;
+            ModelState.Remove("Konto");
+
             if (ModelState.IsValid)
             {
                 _context.Add(produkt);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            if (!ModelState.IsValid)
+            {
+                foreach (var modelState in ModelState)
+                {
+                    foreach (var error in modelState.Value.Errors)
+                    {
+                        ModelState.AddModelError("", error.ErrorMessage);
+                    }
+                }
             }
             return View(produkt);
         }
@@ -82,6 +101,9 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Produkt/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var userLogin = User.Identity?.Name;
+            var konto = _context.Konto.Where(s => s.Sprzedawca.UzytkownikLogin == userLogin).ToList();
+            ViewData["Konto"] = new SelectList(konto, "id_konta", "NazwaUzytkownika");
             if (id == null || _context.Produkt == null)
             {
                 return NotFound();
@@ -100,8 +122,18 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id_produktu,typ,opis")] Produkt produkt)
+        public async Task<IActionResult> Edit(int id, [Bind("id_produktu,typ,opis,cena,ilosc,id_konta")] Produkt produkt)
         {
+            var selectedAccount = _context.Konto.Find(produkt.id_konta);
+
+            if (selectedAccount == null)
+            {
+                ModelState.AddModelError("", "Nie wybrano sprzedawcy");
+            }
+
+            produkt.Konto = selectedAccount;
+            ModelState.Remove("Konto");
+            
             if (id != produkt.id_produktu)
             {
                 return NotFound();
