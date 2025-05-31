@@ -27,7 +27,8 @@ namespace MasterlistOfBusiness.Models
         [Display(Name = "Sprzedawca")]
         public virtual Sprzedawca Sprzedawca { get; set; }
         
-        public virtual ICollection<Inwentarz>? Inwentarze { get; set; } = new List<Inwentarz>();
+        [Display(Name = "Produkty")]
+        public virtual ICollection<Produkt>? Produkty { get; set; } = new List<Produkt>();
     }
 
 }

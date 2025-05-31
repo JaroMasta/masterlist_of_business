@@ -24,7 +24,7 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja
         public async Task<IActionResult> Index()
         {
-            var tr = _context.Transakcja.Include(t => t.Inwentarz).AsNoTracking();
+            var tr = _context.Transakcja.Include(t => t.Produkty).AsNoTracking();
               return _context.Transakcja != null ?
                         View(await tr.ToListAsync()) :
                         Problem("Entity set 'MOBContext.Transakcja'  is null.");
@@ -38,7 +38,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var transakcja = await _context.Transakcja.Include(t => t.Inwentarz)
+            var transakcja = await _context.Transakcja.Include(t => t.Produkty)
                 .FirstOrDefaultAsync(m => m.id_transakcji == id);
             if (transakcja == null)
             {
@@ -48,14 +48,6 @@ namespace MasterlistOfBusiness.Controllers
             return View(transakcja);
         }
 
-        private void PopulateInwentarzDropDownList(object selectedInwentarz = null)
-        {
-            var Inwentarz = from e in _context.Inwentarz
-                                orderby e.ilosc
-                                select e;
-            var res = Inwentarz.AsNoTracking();
-            ViewBag.InwentarzID = new SelectList(res, "Id", "Nazwa", selectedInwentarz);
-        }
 
         // GET: Transakcja/Create
         public IActionResult Create()
@@ -73,12 +65,12 @@ namespace MasterlistOfBusiness.Controllers
             string inwentarzValue = form["Inwentarz"].ToString();
             if (ModelState.IsValid)
             {
-                Inwentarz inwentarz = null;
+                Produkt produkt = null;
                 if (inwentarzValue != "-1")
                 {
-                    var k = _context.Inwentarz.Where(k => k.id_inwentarza == int.Parse(inwentarzValue));
+                    var k = _context.Produkt.Where(k => k.id_produktu == int.Parse(inwentarzValue));
                     if (k.Count() > 0)
-                        inwentarz = k.First();
+                        produkt = k.First();
                 }
 
                 _context.Add(transakcja);

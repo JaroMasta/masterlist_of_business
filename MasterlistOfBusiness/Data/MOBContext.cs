@@ -16,8 +16,6 @@ namespace MasterlistOfBusiness.Data
 
         public DbSet<MasterlistOfBusiness.Models.Konto> Konto { get; set; } = default!;
 
-        public DbSet<MasterlistOfBusiness.Models.Inwentarz> Inwentarz { get; set; } = default!;
-
         public DbSet<MasterlistOfBusiness.Models.Produkt> Produkt { get; set; } = default!;
 
         public DbSet<MasterlistOfBusiness.Models.Sprzedawca> Sprzedawca { get; set; } = default!;

@@ -29,8 +29,8 @@ namespace MasterlistOfBusiness.Controllers
             if (string.IsNullOrEmpty(userLogin))
                 return RedirectToAction("Login", "Account");
 
-            var produkty = _context.Produkt.Where(p => p.Inwentarze.Any(i =>
-                i.Konto.Sprzedawca.UzytkownikLogin == userLogin))
+            var produkty = _context.Produkt.Include(p => p.Konto).
+                Where(p => p.Konto.Sprzedawca.UzytkownikLogin == userLogin)
                 .AsNoTracking();
             // Można dodać sortowanie, filtrowanie lub paginację, jeśli potrzebne
             return View(await produkty.ToListAsync());
@@ -57,6 +57,9 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Produkt/Create
         public IActionResult Create()
         {
+            var userLogin = User.Identity?.Name;
+            var sprzed = _context.Sprzedawca.Where(s => s.UzytkownikLogin == userLogin).ToList();
+            ViewData["Sprzedawca"] = new SelectList(sprzed, "id_sprzedawcy", "login");
             return View();
         }
 

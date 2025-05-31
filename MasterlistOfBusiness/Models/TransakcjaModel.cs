@@ -11,6 +11,7 @@ namespace MasterlistOfBusiness.Models
         public int id_konta { get; set; }
         public int id_produktu { get; set; }
 
-        public virtual Inwentarz? Inwentarz { get; set; }
+        [Display(Name = "Produkty")]
+        public virtual ICollection<Produkt>? Produkty { get; set; } = new List<Produkt>();
     }
 }
