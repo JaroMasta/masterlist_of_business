@@ -11,6 +11,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using BCrypt.Net;
 
 
 namespace MasterlistOfBusiness.Controllers
@@ -71,18 +72,15 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("login,haslo,typ")] Uzytkownik uzytkownik, IFormCollection form)
+                public async Task<IActionResult> Create([Bind("login,Haslo,typ")] Uzytkownik uzytkownik)
         {
-            string sprzedawcaValue = form["Sprzedawca"].ToString();
             if (ModelState.IsValid)
             {
-                Sprzedawca sprzedawca = null;
-                if (sprzedawcaValue != "-1")
-                {
-                    var k = _context.Sprzedawca.Where(k => k.id_sprzedawcy == int.Parse(sprzedawcaValue));
-                    if (k.Count() > 0)
-                        sprzedawca = k.First();
-                }
+                // Hash the password before saving
+                uzytkownik.HasloHash = BCrypt.Net.BCrypt.HashPassword(uzytkownik.Haslo);
+                // Clear the plain text password
+                uzytkownik.Haslo = string.Empty;
+
                 _context.Add(uzytkownik);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -224,7 +222,7 @@ namespace MasterlistOfBusiness.Controllers
                 else
                 {
                     return RedirectToAction("Index", "Home"); // Redirect to Home index for regular users
-                }    return RedirectToAction("Index", "Home");
+                }    
             }
             if (user == null)
             {
