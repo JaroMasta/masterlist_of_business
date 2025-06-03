@@ -68,7 +68,7 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id_produktu,typ,opis,cena,ilosc,id_konta")] Produkt produkt)
+        public async Task<IActionResult> Create([Bind("id_produktu,typ,opis,cena,ilosc,id_konta,nazwa")] Produkt produkt)
         {
             var selectedAccount = _context.Konto.Find(produkt.id_konta);
             if (selectedAccount == null)
@@ -122,7 +122,7 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id_produktu,typ,opis,cena,ilosc,id_konta")] Produkt produkt)
+        public async Task<IActionResult> Edit(int id, [Bind("id_produktu,typ,opis,cena,ilosc,id_konta, nazwa")] Produkt produkt)
         {
             var selectedAccount = _context.Konto.Find(produkt.id_konta);
 

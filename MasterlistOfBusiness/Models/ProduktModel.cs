@@ -8,6 +8,8 @@ namespace MasterlistOfBusiness.Models
         [Display(Name = "Numer id produktu")]
         public int id_produktu { get; set; }
 
+        public string? nazwa { get; set;  }
+
         [Required]
         [Display(Name = "Typ produktu")]
         [StringLength(100, ErrorMessage = "Typ produktu nie może przekraczać 100 znaków.")]

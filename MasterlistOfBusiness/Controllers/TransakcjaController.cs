@@ -52,6 +52,16 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja/Create
         public IActionResult Create()
         {
+            var userLogin = User.Identity?.Name;
+            var produktyList =  _context.Produkt
+            .Include(p => p.Konto)
+            .ThenInclude(k => k.Sprzedawca)
+        .Where(p =>
+            p.Konto != null &&
+            p.Konto.Sprzedawca != null &&
+            p.Konto.Sprzedawca.UzytkownikLogin == userLogin)
+        .ToList();
+            ViewBag.Produkty = produktyList;
             return View();
         }
 
@@ -60,18 +70,16 @@ namespace MasterlistOfBusiness.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja, IFormCollection form)
+        public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja, IFormCollection form, List<int> selectedProdukty)
         {
-            string inwentarzValue = form["Inwentarz"].ToString();
+             var produkty = _context.Produkt.Where(p => selectedProdukty.Contains(p.id_produktu)).ToList();
+
+            transakcja.Produkty = produkty;
+
             if (ModelState.IsValid)
             {
                 Produkt produkt = null;
-                if (inwentarzValue != "-1")
-                {
-                    var k = _context.Produkt.Where(k => k.id_produktu == int.Parse(inwentarzValue));
-                    if (k.Count() > 0)
-                        produkt = k.First();
-                }
+
 
                 _context.Add(transakcja);
                 await _context.SaveChangesAsync();
