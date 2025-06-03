@@ -24,7 +24,7 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja
         public async Task<IActionResult> Index()
         {
-            var tr = _context.Transakcja.Include(t => t.Produkty).AsNoTracking();
+            var tr = _context.Transakcja.Include(t => t.Produkt).AsNoTracking();
               return _context.Transakcja != null ?
                         View(await tr.ToListAsync()) :
                         Problem("Entity set 'MOBContext.Transakcja'  is null.");
@@ -38,7 +38,7 @@ namespace MasterlistOfBusiness.Controllers
                 return NotFound();
             }
 
-            var transakcja = await _context.Transakcja.Include(t => t.Produkty)
+            var transakcja = await _context.Transakcja.Include(t => t.Produkt)
                 .FirstOrDefaultAsync(m => m.id_transakcji == id);
             if (transakcja == null)
             {
@@ -61,7 +61,7 @@ namespace MasterlistOfBusiness.Controllers
             p.Konto.Sprzedawca != null &&
             p.Konto.Sprzedawca.UzytkownikLogin == userLogin)
         .ToList();
-            ViewBag.Produkty = produktyList;
+            ViewBag.id_produktu = new SelectList(produktyList, "id_produktu", "nazwa");
             return View();
         }
 
@@ -72,19 +72,14 @@ namespace MasterlistOfBusiness.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja, IFormCollection form, List<int> selectedProdukty)
         {
-             var produkty = _context.Produkt.Where(p => selectedProdukty.Contains(p.id_produktu)).ToList();
-
-            transakcja.Produkty = produkty;
-
             if (ModelState.IsValid)
-            {
-                Produkt produkt = null;
-
-
+            {   
                 _context.Add(transakcja);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            // Debug
+            Console.WriteLine("ModelState is not valid. Errors: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
             return View(transakcja);
         }
 

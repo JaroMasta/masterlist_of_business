@@ -22,6 +22,11 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.id_produktu)
         </dd>
+        <dt class="col-sm-2">Produkt</dt>
+        <dd class="col-sm-10">@Model.Produkt?.nazwa</dd>
+
+        <dt class="col-sm-2">Cena</dt>
+        <dd class="col-sm-10">@Model.Produkt?.cena zł</dd>
     </dl>
 </div>
 <div>

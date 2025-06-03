@@ -12,6 +12,8 @@ namespace MasterlistOfBusiness.Models
         public int id_produktu { get; set; }
 
         [Display(Name = "Produkty")]
-        public virtual ICollection<Produkt>? Produkty { get; set; } = new List<Produkt>();
+
+        [ForeignKey("id_produktu")]
+        public virtual Produkt? Produkt { get; set; }
     }
 }

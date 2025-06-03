@@ -9,7 +9,7 @@ namespace MasterlistOfBusiness.Data
 {
     public class MOBContext : DbContext
     {
-        public MOBContext (DbContextOptions<MOBContext> options)
+        public MOBContext(DbContextOptions<MOBContext> options)
             : base(options)
         {
         }
@@ -23,5 +23,7 @@ namespace MasterlistOfBusiness.Data
         public DbSet<MasterlistOfBusiness.Models.Transakcja> Transakcja { get; set; } = default!;
 
         public DbSet<MasterlistOfBusiness.Models.Uzytkownik> Uzytkownik { get; set; } = default!;
+
+
     }
 }
