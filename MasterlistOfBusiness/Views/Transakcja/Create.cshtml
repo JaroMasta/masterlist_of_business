@@ -4,8 +4,6 @@
     ViewData["Title"] = "Create";
 }
 
-
-
 <h1>Create</h1>
 
 <h4>Transakcja</h4>
@@ -14,14 +12,13 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            <label>Select products</label>
-        <select name="selectedProdukty" class="form-control" multiple="multiple">
-            @foreach (var produkt in (ViewBag.Produkty as List<MasterlistOfBusiness.Models.Produkt> ?? new List<MasterlistOfBusiness.Models.Produkt>()))
-            {
-            <option >@produkt.nazwa</option>
-            }
-        </select>
+
+            <div class="form-group">
+                <label asp-for="id_produktu" class="control-label">Wybierz produkt</label>
+                <select asp-for="id_produktu" class="form-control" asp-items="ViewBag.id_produktu"></select>
+                <span asp-validation-for="id_produktu" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
