@@ -21,6 +21,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+
 // Tworzenie domyślnego admina przy pierwszym uruchomieniu
 using (var scope = app.Services.CreateScope())
 {

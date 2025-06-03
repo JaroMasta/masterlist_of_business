@@ -19,6 +19,7 @@ namespace MasterlistOfBusiness.Models
         [NotMapped]
         [Display(Name = "Hasło")]
         public string Haslo { get; set; }
+        
         // Nawigacja do encji Sprzedawca
         public virtual ICollection<Sprzedawca>? Sprzedawca { get; set; } = new List<Sprzedawca>();
     }

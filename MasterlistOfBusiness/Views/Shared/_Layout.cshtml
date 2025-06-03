@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MasterlistOfBusiness.styles.css" asp-append-version="true" />
+
+
 </head>
 <body>
     <header>
@@ -37,6 +39,13 @@
                         <li class="nav-item"></li>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Transakcja" asp-action="Index">Transakcje</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Uzytkownik" asp-action="Index">Użytkownicy</a>
+                                </li>
+                            }
+
                     </ul>
                 </div>
             </div>
