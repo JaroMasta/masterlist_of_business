@@ -77,6 +77,19 @@ namespace MasterlistOfBusiness.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(transakcja);
+                // Znajdź produkt i zmniejsz ilość
+                var produkt = await _context.Produkt.FindAsync(transakcja.id_produktu);
+                if (produkt != null && produkt.ilosc > 0)
+                {
+                    produkt.ilosc -= 1;
+                    _context.Update(produkt);
+                }
+                else
+                {
+                    // np. walidacja: nie można zrealizować transakcji jeśli ilość to 0
+                    ModelState.AddModelError("", "Nie można zrealizować transakcji. Produkt niedostępny.");
+                    return View(transakcja);
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
