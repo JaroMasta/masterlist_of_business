@@ -24,10 +24,12 @@ namespace MasterlistOfBusiness.Controllers
         // GET: Transakcja
         public async Task<IActionResult> Index()
         {
-            var tr = _context.Transakcja.Include(t => t.Produkt).AsNoTracking();
-              return _context.Transakcja != null ?
-                        View(await tr.ToListAsync()) :
-                        Problem("Entity set 'MOBContext.Transakcja'  is null.");
+            var userLogin = User.Identity?.Name;
+            var tr = _context.Transakcja.Include(t => t.Produkt).Where(p => p.Produkt.Konto.Sprzedawca.UzytkownikLogin == userLogin)
+            .AsNoTracking();
+            return _context.Transakcja != null ?
+                      View(await tr.ToListAsync()) :
+                      Problem("Entity set 'MOBContext.Transakcja'  is null.");
         }
 
         // GET: Transakcja/Details/5
@@ -53,7 +55,7 @@ namespace MasterlistOfBusiness.Controllers
         public IActionResult Create()
         {
             var userLogin = User.Identity?.Name;
-            var produktyList =  _context.Produkt
+            var produktyList = _context.Produkt
             .Include(p => p.Konto)
             .ThenInclude(k => k.Sprzedawca)
         .Where(p =>
@@ -73,7 +75,7 @@ namespace MasterlistOfBusiness.Controllers
         public async Task<IActionResult> Create([Bind("id_transakcji,id_konta,id_produktu")] Transakcja transakcja, IFormCollection form, List<int> selectedProdukty)
         {
             if (ModelState.IsValid)
-            {   
+            {
                 _context.Add(transakcja);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -174,6 +176,33 @@ namespace MasterlistOfBusiness.Controllers
         private bool TransakcjaExists(int id)
         {
             return (_context.Transakcja?.Any(e => e.id_transakcji == id)).GetValueOrDefault();
+        }
+        
+        public IActionResult Profit()
+        {
+            var userLogin = User.Identity?.Name;
+
+            var transakcje = _context.Transakcja.Include(t => t.Produkt).
+            Where(p => p.Produkt.Konto.Sprzedawca.UzytkownikLogin == userLogin);
+
+            var profit = transakcje
+            .GroupBy(t => new 
+            {
+                t.Produkt.Konto.id_konta,
+                t.Produkt.Konto.NazwaUzytkownika
+            })
+            .Select(g => new
+            {
+                KontoId = g.Key.id_konta,
+                KontoNazwa = g.Key.NazwaUzytkownika,
+                TotalProfit = g.Sum(t => t.Produkt.cena)
+            })
+            .ToList();
+
+
+            ViewBag.profit = profit;
+
+            return View();
         }
     }
 }
