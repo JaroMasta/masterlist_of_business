@@ -133,7 +133,7 @@ namespace MasterlistOfBusiness.Controllers
 
             produkt.Konto = selectedAccount;
             ModelState.Remove("Konto");
-            
+
             if (id != produkt.id_produktu)
             {
                 return NotFound();
@@ -202,6 +202,20 @@ namespace MasterlistOfBusiness.Controllers
         private bool ProduktExists(int id)
         {
             return (_context.Produkt?.Any(e => e.id_produktu == id)).GetValueOrDefault();
+        }
+        
+        public IActionResult Value()
+        {
+            var userLogin = User.Identity?.Name;
+            
+            var totalValue = _context.Produkt.Include(p => p.Konto).
+                Where(p => p.Konto.Sprzedawca.UzytkownikLogin == userLogin)
+                .Select(p => p.cena * p.ilosc)
+                .Sum();
+
+            ViewBag.TotalValue = totalValue;
+
+            return View();
         }
     }
 }

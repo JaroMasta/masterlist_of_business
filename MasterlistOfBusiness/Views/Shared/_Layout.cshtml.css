@@ -46,3 +46,11 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.pagedoll {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 100px; 
+    z-index: 9999;
+}
